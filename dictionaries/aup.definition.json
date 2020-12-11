@@ -1,0 +1,32 @@
+{
+	"yes": {
+		"en": "Continue"
+	},
+	"no": {
+		"en": "Abort"
+	},
+	"review": {
+		"en": "Review"
+	},
+	"failure_text": {
+		"en": "<p>We are sorry for the inconvienience but we could not retrieve role information from the Grid Configuration Database (GOCDB)</b>.</p><br/><p>Choose whether to <b>Abort</b> or <b>Continue accessing the service without role information from the GOCDB</b>.</p><br/>"
+	},
+	"error_msg_title": {
+		"en": "<b>This is what went wrong:</b>"
+	},
+	"no_aup_text": {
+		"en": "You decided to abort authentication."
+	},
+	"no_aup_return": {
+		"en": "Return to previous page"
+	},
+	"aup_privacy_policy": {
+		"en": "Privacy Policy for the service"
+	},
+	"updated_aup_title": {
+		"en": "We've updated our Acceptable Use Policy(ies).<br/><br/>Please find below the list with the updated Acceptable Use Policies.<br/><br/>You can click 'Continue' any time."
+	},
+	"updated_aup_description": {
+		"en": "You can Review the updated Acceptable Use Policies by clicking %HERE%"
+	}
+}

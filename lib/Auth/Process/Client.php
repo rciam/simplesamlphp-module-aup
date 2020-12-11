@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * Authproc filter for retrieving attributes from the AUP and adding them to the list of attributes received from the
+ * identity provider.
+ *
+ * Example configuration:
+ *
+ *    'authproc' => array(
+ *       ...
+ *       '82' => array(
+ *            'class' => 'aup:Client',
+ *            'aupEndpoint' => '',
+ *            'spBlacklist' => array(),
+ *       ),
+ *
+ * @author Nick Mastoris <nmastoris@admin.grnet.gr>
+ */
+class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
+{
+    // List of SP entity IDs that should be excluded from this filter.
+    private $spBlacklist = array();
+
+    public function __construct($config, $reserved)
+    {
+        parent::__construct($config, $reserved);
+        $params = array(
+            'aupEndpoint',
+            'spBlacklist'
+        );
+        foreach ($params as $param) {
+            if (!array_key_exists($param, $config)) {
+                throw new SimpleSAML_Error_Exception(
+                    'Missing required configuration parameter: ' .$param);
+            }
+            $this->config[$param] = $config[$param];
+        }
+    }
+
+    /**
+     * @param array $state
+     */
+    public function process(&$state)
+    {
+        SimpleSAML_Logger::debug("[aup] process: blacklisted SPs ". var_export($this->config['spBlacklist'], true));
+        if (isset($state['SPMetadata']['entityid']) && in_array($state['SPMetadata']['entityid'], $this->config['spBlacklist'], true)) {
+            SimpleSAML_Logger::debug("[aup] process: Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
+            return;
+        }
+        try {
+            SimpleSAML_Logger::info('[aup] process: eduPersonUniqueId'. var_export($state['Attributes']['eduPersonUniqueId'],true));
+            // Check if we have an updated aup
+            $changed_aups = array();
+            //to be deleted
+            SimpleSAML_Logger::info('[aup] process: users AUP TEST'. var_export($state['rciamAttributes']['aup'],true));
+
+            foreach ($state['rciamAttributes']['aup'] as $aup) {
+
+              if ($aup['version'] != $aup['agreed']['version']) {
+                  $changed_aups[] = $aup;
+                SimpleSAML_Logger::info('[aup] process: USERID CHANGED'. var_export($state["rciamAttributes"]["userId"],true));
+              }
+            }
+            if (
+              //isset($state["rciamAttributes"]['aup'])
+              //&& !empty($state['aup']['pending']) &&
+              !empty($changed_aups)
+              && $state['Attributes']['eduPersonUniqueId'][0] == 'befd2b9ed8878c542555829cb21da3e25ad91a0f9c56195d7a86a650d19419ab@egi.eu'
+              ) {
+                  $state['aup:changedAups'] = $changed_aups;
+                  $state['aup:aupEndpoint'] = str_replace("%rciamUserId%", $state["rciamAttributes"]["userId"]["id"], $this->config['aupEndpoint']);
+                  $id = SimpleSAML_Auth_State::saveState($state, 'aup_state');
+                  $url = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
+                  \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
+          }
+          return;
+        } catch (\Exception $e) {
+
+        }
+
+    }
+
+    /**
+      * @param $e
+      * @throws Exception
+      */
+    private function showException($e)
+    {
+        $globalConfig = SimpleSAML_Configuration::getInstance();
+        $t = new SimpleSAML_XHTML_Template($globalConfig, 'aup:exception.tpl.php');
+        $t->data['e'] = $e->getMessage();
+        $t->show();
+        exit();
+    }
+}
