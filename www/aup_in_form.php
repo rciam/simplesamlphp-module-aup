@@ -1,9 +1,9 @@
 <?php
 /**
- * User Inform Form
+ * Review Updated AUP Form
  *
  * This script displays a page to the user, which requests that the user
- * authorizes the release of attributes.
+ * should review the updated AUPs.
  *
  * @package SimpleSAMLphp
  */
@@ -17,6 +17,9 @@
  *
  * so this is just to make sure.
  */
+
+
+
 session_cache_limiter('nocache');
 $globalConfig = SimpleSAML_Configuration::getInstance();
 if (!array_key_exists('StateId', $_REQUEST)) {
@@ -48,16 +51,23 @@ if ( array_key_exists('yes', $_REQUEST) || array_key_exists('no', $_REQUEST) ) {
 // The user has pressed the yes-button
 // The resumeProcessing function needs a ReturnUrl or a ReturnCall in order to proceed
 if (array_key_exists('yes', $_REQUEST)) {
-  if (array_key_exists('aup:changed_aups', $state)) {
-    unset($state['aup:changed_aups']);
+  SimpleSAML_Logger::debug("[aup] REQUEST". var_export($_REQUEST, true));
+  foreach($state['aup:changedAups'] as $aup) {
+    SimpleSAML_Logger::debug("[aup] Changed AUPS:". $aup['id']);
+    if(!empty($_REQUEST['terms_and_conditions_'.$aup['id']])){
+        //make the post request..
+      //addCoTAndCAgreement($state["rciamAttributes"]["userId"]["id"], $aup['id']);
+      var_dump($aup['id']);
+    }
+  }
+  if (array_key_exists('aup:changedAups', $state)) {
+    unset($state['aup:changedAups']);
   }
   if (array_key_exists('aup:aupEndpoint', $state)) {
     unset($state['aup:aupEndpoint']);
   }
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
 }
-
-
 ////////////// End of handling users choice
 ///
 ///
@@ -88,3 +98,74 @@ if ($privacypolicy !== false) {
 $t->data['sppp'] = $privacypolicy;
 
 $t->show();
+
+function addCoTAndCAgreement($coPersonId, $coTAndCId)
+{
+  //SimpleSAML_Logger::debug("[attrauthcomanage] addCoTAndCAgreement:" // TODO
+  //    . " coPersonId=" . var_export($coPersonId, true)
+  //    . ", coTAndCId=" . var_export($coTAndCId, true));
+  //
+  //$url = $this->apiBaseURL . "/co_t_and_c_agreements.json";
+  $url = "https://aai-dev.egi.eu/registry" . "/co_t_and_c_agreements.json";
+  // Construct my data
+  $reqDataArr = array();
+  $reqDataArr['RequestType'] = 'CoTAndCAgreements';
+  $reqDataArr['Version'] = '1.0';
+  $reqDataArr['CoTAndCAgreements'][0]['Version'] = '1.0';
+  $reqDataArr['CoTAndCAgreements'][0]['CoTermsAndConditionsId'] = (string) ($coTAndCId);
+  $reqDataArr['CoTAndCAgreements'][0]['Person']['Type'] = 'CO';
+  $reqDataArr['CoTAndCAgreements'][0]['Person']['Id'] = $coPersonId;
+
+  $res = http('POST', $url, $reqDataArr);
+  return $res;
+}
+
+function http($method, $url, $data = null)
+{
+  //SimpleSAML_Logger::debug("[attrauthcomanage] http: method=" // TODO debug
+  //echo "[attrauthcomanage] http: method=" // TODO debug
+  //    . var_export($method, true) . ", url=" . var_export($url, true)
+  //    . ", data=" . var_export($data, true), "\n";
+  $ch = curl_init($url);
+  curl_setopt_array(
+    $ch,
+    array(
+      CURLOPT_CUSTOMREQUEST => $method,
+      CURLOPT_CONNECTTIMEOUT => 5,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_USERPWD => 'aupUsrDev' . ":" . 'znu-K#c@3cP=Wd9*',
+      //CURLOPT_SSL_VERIFYPEER => $this->verifyPeer,
+    )
+  );
+  if (($method == "POST" || $method == "PUT") && !empty($data)) {
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                     'Content-Type: application/json',
+                     'Content-Length: ' . strlen($data))
+    );
+  }
+
+  // Send the request
+  $response = curl_exec($ch);
+  $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+  // Check for error
+  if ($http_code !== 200 && $http_code !== 201 && $http_code !== 204 && $http_code !== 302 && $http_code !== 404) {
+    echo "[aup] http: method=" // TODO error logging
+      . var_export($method, true) . ", url=" . var_export($url, true)
+      . ", data=" . var_export($data, true)
+      . ": API call failed: HTTP response code: "
+      . var_export($http_code, true) . ", error message: '"
+      . var_export(curl_error($ch), true) . "'\n";
+    // Close session
+    curl_close($ch);
+    //throw new SimpleSAML_Error_Exception("Failed to communicate with COmanage Registry");
+  }
+  // Close session
+  curl_close($ch);
+  $result = json_decode($response);
+  //SimpleSAML_Logger::error("[attrauthcomanage] http: result=" // TODO
+  //    . var_export($result, true));
+  assert('json_last_error()===JSON_ERROR_NONE');
+  return $result;
+}
