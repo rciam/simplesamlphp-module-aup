@@ -54,10 +54,12 @@ if (array_key_exists('yes', $_REQUEST)) {
   SimpleSAML_Logger::debug("[aup] REQUEST". var_export($_REQUEST, true));
   foreach($state['aup:changedAups'] as $aup) {
     SimpleSAML_Logger::debug("[aup] Changed AUPS:". $aup['id']);
+    SimpleSAML_Logger::debug("[aup] User Id:".   $state["rciamAttributes"]["userId"]["id"]);
+
     if(!empty($_REQUEST['terms_and_conditions_'.$aup['id']])){
         //make the post request..
-      //addCoTAndCAgreement($state["rciamAttributes"]["userId"]["id"], $aup['id']);
-      var_dump($aup['id']);
+      addCoTAndCAgreement($state["rciamAttributes"]["userId"]["id"], $aup['id']);
+      //var_dump($aup['id']);
     }
   }
   if (array_key_exists('aup:changedAups', $state)) {
@@ -106,7 +108,7 @@ function addCoTAndCAgreement($coPersonId, $coTAndCId)
   //    . ", coTAndCId=" . var_export($coTAndCId, true));
   //
   //$url = $this->apiBaseURL . "/co_t_and_c_agreements.json";
-  $url = "https://aai-dev.egi.eu/registry" . "/co_t_and_c_agreements.json";
+  $url = "https://aai-dev.egi.eu/registry" . "/co_t_and_c_agreements/add.json";
   // Construct my data
   $reqDataArr = array();
   $reqDataArr['RequestType'] = 'CoTAndCAgreements';
@@ -115,8 +117,8 @@ function addCoTAndCAgreement($coPersonId, $coTAndCId)
   $reqDataArr['CoTAndCAgreements'][0]['CoTermsAndConditionsId'] = (string) ($coTAndCId);
   $reqDataArr['CoTAndCAgreements'][0]['Person']['Type'] = 'CO';
   $reqDataArr['CoTAndCAgreements'][0]['Person']['Id'] = $coPersonId;
-
-  $res = http('POST', $url, $reqDataArr);
+  $req = json_encode($reqDataArr);
+  $res = http('POST', $url, $req);
   return $res;
 }
 
@@ -164,8 +166,8 @@ function http($method, $url, $data = null)
   // Close session
   curl_close($ch);
   $result = json_decode($response);
-  //SimpleSAML_Logger::error("[attrauthcomanage] http: result=" // TODO
-  //    . var_export($result, true));
+  SimpleSAML_Logger::error("[aup] api call for renew AUP http: result="
+      . var_export($result, true));
   assert('json_last_error()===JSON_ERROR_NONE');
   return $result;
 }
