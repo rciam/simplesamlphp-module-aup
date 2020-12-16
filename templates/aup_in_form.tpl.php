@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Template form for attribute selection.
  *
@@ -62,24 +63,21 @@ $this->data['head'] = '<style type="text/css">
 .aup_content{
    cursor: pointer;
 }
-li:nth-child(odd) {
+.aup_rows:nth-child(odd) {
 background: #fafafa; 
 }
 
-li:nth-child(even) {
+.aup_rows:nth-child(even) {
 background: #ffffff;
 }
 html, body {
 height:100%;
 }
-#loader {
-height:100vh;
-}
+
 </style>
 <script type="text/javascript">
 $(function() {
-    var height = $("#content").height() + $(".header").height();
-    console.log(height);
+    height = $("#content").height() + $(".header").height();
     $("body").prepend("<div id=\"loader\" style=\"height:"+height+"px\"><div class=\"sk-circle\"><div class=\"sk-circle1 sk-child\"></div><div class=\"sk-circle2 sk-child\"></div><div class=\"sk-circle3 sk-child\"></div><div class=\"sk-circle4 sk-child\"></div><div class=\"sk-circle5 sk-child\"></div><div class=\"sk-circle6 sk-child\"></div><div class=\"sk-circle7 sk-child\"></div><div class=\"sk-circle8 sk-child\"></div><div class=\"sk-circle9 sk-child\"></div><div class=\"sk-circle10 sk-child\"></div><div class=\"sk-circle11 sk-child\"></div><div class=\"sk-circle12 sk-child\"></div></div></div>")
     
     $("#yesbutton").on("click", function(){
@@ -98,77 +96,88 @@ $(function() {
 $this->includeAtTemplateBase('includes/header.php');
 ?>
 
-<p>
-  <?php
-  print '<h3 class="text-center">' . $this->t('{aup:aup:updated_aup_title}') . '</h3>';
-  ?>
-</p>
 
-<!--  Form that will be sumbitted on Yes -->
-<form style="display: inline; margin: 0px; padding: 0px" action="<?php
-print htmlspecialchars($this->data['yesTarget']); ?>">
-    <h3 class="text-center" style="margin-top:3em; text-decoration: underline;">List of Updated Acceptable Use
-        Policies</h3>
-    <div style="font-size: 1em;">
-        <ol style="text-align: center; list-style-position: inside; list-style-type: none; padding:0px">
+<?php
+print '<h2 class="text-center">' . $this->t('{aup:aup:updated_aup_title}') . '</h2>';
+?>
+
+<?php
+print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-height: 1.6em;">' . $this->t(
+    '{aup:aup:updated_aup_description}'
+  ) . '</div>';
+?>
+
+    <!--  Form that will be sumbitted on Yes -->
+    <form style="display: inline; margin: 0px; padding: 0px" action="<?php
+    print htmlspecialchars($this->data['yesTarget']); ?>">
+        <h3 class="text-center" style="margin-top:3em; text-decoration: underline;">
+          <?php
+          print $this->t('{aup:aup:updated_aup_list}') ?>
+        </h3>
+        <div style="font-size: 1em;">
+
           <?php
           foreach ($aups as $aup): ?>
-              <li class="text-center" style="padding:7px 0 7px; margin-top:1em">
-                  <h3><a class="aup_content " data-description="<?php
-                    print $aup['description']; ?>" data-url="<?php
-                    print $aup['url']; ?>"><?php
-                      print $aup['description']; ?></a>&nbsp;&nbsp; <input type="checkbox"
-                                                                           name="terms_and_conditions_<?php
-                                                                           print $aup['id'] ?>"/><span
-                              style="font-size: 0.9em"> I Agree</span></h3>
-              </li>
+              <div class="row aup_rows" style="padding:7px 0px">
+                  <div class="col-lg-5 col-lg-offset-2 col-md-offset-2 col-md-5 col-sm-7">
+                      <h3>
+                          <a class="aup_content"
+                             data-description="<?php print $aup['description']; ?>"
+                             data-url="<?php print $aup['url']; ?>">
+                            <?php print $aup['description']; ?>
+                          </a>
+                      </h3>
+                  </div>
+                  <div class="col-lg-5 col-md-5 col-sm-5"><h3><input type="checkbox"
+                                                                     name="terms_and_conditions_<?php
+                                                                     print $aup['id'] ?>"/><span
+                                  style="font-size: 0.9em"> I Agree</span></h3>
+                  </div>
+              </div>
           <?php
           endforeach; ?>
-        </ol>
-    </div>
+        </div>
 
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12" id="iframe_container"></div>
-    </div>
-    <p></p>
-    <p style="margin:0em 1em 5em " class="text-center">
-      <?php
-      foreach ($this->data['yesData'] as $name => $value) {
-        print '<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars($value) . '" />';
-      }
-      ?>
-        <button type="submit" name="yes"
-                class="ssp-btn btn ssp-btn__action ssp-btns-container--btn__left text-uppercase" id="yesbutton">
+        <p style="margin:0em 1em 5em " class="text-center">
           <?php
-          print htmlspecialchars($this->t('{aup:aup:yes}')) ?>
-        </button>
-    </p>
-</form>
-<p class="text-center" style="margin-top:20px;margin-bottom:50px"><?php
-  print $this->t(
-    '{aup:aup:updated_aup_description}',
-    array('%HERE%' => '<a id="aups_link" onclick="return false;" href="#">here</a>')
-  ) ?></p>
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Ok</button>
+          foreach ($this->data['yesData'] as $name => $value) {
+            print '<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars(
+                $value
+              ) . '" />';
+          }
+          ?>
+            <button type="submit" name="yes"
+                    class="ssp-btn btn ssp-btn__action ssp-btns-container--btn__left text-uppercase" id="yesbutton">
+              <?php
+              print htmlspecialchars($this->t('{aup:aup:yes}')) ?>
+            </button>
+        </p>
+    </form>
+    <p class="text-center" style="margin-top:20px;margin-bottom:50px"><?php
+      print $this->t(
+        '{aup:aup:updated_aup_more_information}',
+        array('%HERE%' => '<a id="aups_link" onclick="return false;" href="#">here</a>')
+      ) ?></p>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Ok</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 <?php

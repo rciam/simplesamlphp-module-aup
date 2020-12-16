@@ -32,43 +32,44 @@ $id = $_REQUEST['StateId'];
 $state = SimpleSAML_Auth_State::loadState($id, 'aup_state');
 
 // Get the spEntityId for the privacy policy section
-if (array_key_exists('core:SP', $state)) {
+/*if (array_key_exists('core:SP', $state)) {
   $spentityid = $state['core:SP'];
 } else if (array_key_exists('saml:sp:State', $state)) {
   $spentityid = $state['saml:sp:State']['core:SP'];
 } else {
   $spentityid = 'UNKNOWN';
 }
-/*
-// The user has pressed the yes-button
-if ( array_key_exists('yes', $_REQUEST) || array_key_exists('no', $_REQUEST) ) {
-  // Remove the fields that we do not want any more
-  if (array_key_exists('attrauthgocdb:error_msg', $state)) {
-    unset($state['attrauthgocdb:error_msg']);
-  }
-}
 */
 // The user has pressed the yes-button
 // The resumeProcessing function needs a ReturnUrl or a ReturnCall in order to proceed
 if (array_key_exists('yes', $_REQUEST)) {
   SimpleSAML_Logger::debug("[aup] REQUEST". var_export($_REQUEST, true));
+  $url = $state['aup:aupApiEndpoint'];
   foreach($state['aup:changedAups'] as $aup) {
     SimpleSAML_Logger::debug("[aup] Changed AUPS:". $aup['id']);
     SimpleSAML_Logger::debug("[aup] User Id:".   $state["rciamAttributes"]["userId"]["id"]);
 
     if(!empty($_REQUEST['terms_and_conditions_'.$aup['id']])){
-        //make the post request..
-      addCoTAndCAgreement($state["rciamAttributes"]["userId"]["id"], $aup['id']);
-      //var_dump($aup['id']);
+      // Make the post requests
+      addCoTAndCAgreement($state["rciamAttributes"]["userId"]["id"], $aup['id'], $url, $state['aup:apiUsername'], $state['aup:apiPassword']);
     }
   }
   if (array_key_exists('aup:changedAups', $state)) {
     unset($state['aup:changedAups']);
   }
-  if (array_key_exists('aup:aupEndpoint', $state)) {
-    unset($state['aup:aupEndpoint']);
+  if (array_key_exists('aup:aupListEndpoint', $state)) {
+    unset($state['aup:aupListEndpoint']);
   }
-    SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+  if (array_key_exists('aup:aupApiEndpoint', $state)) {
+    unset($state['aup:aupApiEndpoint']);
+  }
+  if (array_key_exists('aup:apiUsername', $state)) {
+    unset($state['aup:aupUsername']);
+  }
+  if (array_key_exists('aup:apiPassword', $state)) {
+    unset($state['aup:aupPassword']);
+  }
+  SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
 }
 ////////////// End of handling users choice
 ///
@@ -81,34 +82,14 @@ $t->data['dstMetadata'] = $state['Destination'];
 $t->data['yesTarget'] = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
 $t->data['yesData'] = array('StateId' => $id);
 $t->data['changedAups'] = $state['aup:changedAups'];
-$t->data['aupEndpoint'] = $state['aup:aupEndpoint'];
-// Fetch privacypolicy
-if (array_key_exists('privacypolicy', $state['Destination'])) {
-  $privacypolicy = $state['Destination']['privacypolicy'];
-} elseif (array_key_exists('privacypolicy', $state['Source'])) {
-  $privacypolicy = $state['Source']['privacypolicy'];
-} else {
-  $privacypolicy = false;
-}
-if ($privacypolicy !== false) {
-  $privacypolicy = str_replace(
-    '%SPENTITYID%',
-    urlencode($spentityid),
-    $privacypolicy
-  );
-}
-$t->data['sppp'] = $privacypolicy;
-
+$t->data['aupListEndpoint'] = $state['aup:aupListEndpoint'];
 $t->show();
 
-function addCoTAndCAgreement($coPersonId, $coTAndCId)
+function addCoTAndCAgreement($coPersonId, $coTAndCId, $url, $apiUser, $apiPass)
 {
-  //SimpleSAML_Logger::debug("[attrauthcomanage] addCoTAndCAgreement:" // TODO
-  //    . " coPersonId=" . var_export($coPersonId, true)
-  //    . ", coTAndCId=" . var_export($coTAndCId, true));
-  //
-  //$url = $this->apiBaseURL . "/co_t_and_c_agreements.json";
-  $url = "https://aai-dev.egi.eu/registry" . "/co_t_and_c_agreements/add.json";
+
+  //$url = "https://aai-dev.egi.eu/registry" . "/co_t_and_c_agreements/add.json";
+
   // Construct my data
   $reqDataArr = array();
   $reqDataArr['RequestType'] = 'CoTAndCAgreements';
@@ -118,16 +99,13 @@ function addCoTAndCAgreement($coPersonId, $coTAndCId)
   $reqDataArr['CoTAndCAgreements'][0]['Person']['Type'] = 'CO';
   $reqDataArr['CoTAndCAgreements'][0]['Person']['Id'] = $coPersonId;
   $req = json_encode($reqDataArr);
-  $res = http('POST', $url, $req);
+  $res = http('POST', $url, $req, $apiUser, $apiPass);
   return $res;
 }
 
-function http($method, $url, $data = null)
+function http($method, $url, $data = null, $apiUser, $apiPass)
 {
-  //SimpleSAML_Logger::debug("[attrauthcomanage] http: method=" // TODO debug
-  //echo "[attrauthcomanage] http: method=" // TODO debug
-  //    . var_export($method, true) . ", url=" . var_export($url, true)
-  //    . ", data=" . var_export($data, true), "\n";
+
   $ch = curl_init($url);
   curl_setopt_array(
     $ch,
@@ -135,8 +113,8 @@ function http($method, $url, $data = null)
       CURLOPT_CUSTOMREQUEST => $method,
       CURLOPT_CONNECTTIMEOUT => 5,
       CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_USERPWD => 'aupUsrDev' . ":" . 'znu-K#c@3cP=Wd9*',
-      //CURLOPT_SSL_VERIFYPEER => $this->verifyPeer,
+      //CURLOPT_USERPWD => 'aupUsrDev' . ":" . 'znu-K#c@3cP=Wd9*',
+      CURLOPT_USERPWD => $apiUser . ":" . $apiPass,
     )
   );
   if (($method == "POST" || $method == "PUT") && !empty($data)) {
