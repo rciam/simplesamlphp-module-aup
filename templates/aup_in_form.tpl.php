@@ -53,12 +53,11 @@ if (is_array($dstName)) {
 if (array_key_exists('changedAups', $this->data)) {
   $aups = $this->data['changedAups'];
 }
-if (array_key_exists('aupEndpoint', $this->data)) {
-  $aupEndpoint = $this->data['aupEndpoint'];
+if (array_key_exists('aupListEndpoint', $this->data)) {
+  $aupListEndpoint = $this->data['aupListEndpoint'];
 }
 
 $this->data['jquery'] = array('core' => true, 'ui' => true, 'css' => true);
-//$this->data['head'] = '<link rel="stylesheet" type="text/css" href="/' . $this->data['baseurlpath'] . 'module.php/attrauthcomanage/resources/css/style.css" />' . "\n";
 $this->data['head'] = '<style type="text/css">
 .aup_content{
    cursor: pointer;
@@ -84,13 +83,28 @@ $(function() {
         $("#loader").show();
     })
     $(".aup_content").on("click", function(){
-        $("#exampleModal .modal-header").html("<h2>"+$(this).data("description")+"</h2>")  
-        $("#exampleModal .modal-body").html("<iframe id=\"aups_panel\" style=\"width: 100%; height: 70vh; position: relative; top:0px; padding:0px\" frameBorder=\"0\" src=\'"+$(this).data("url")+"\'></iframe>");
-        $("#exampleModal").modal("show");
+        $("#aupModal .modal-header").html("<h2>"+$(this).data("description")+"</h2>")  
+        $("#aupModal .modal-body").html("<iframe id=\"aups_panel\" style=\"width: 100%; height: 70vh; position: relative; top:0px; padding:0px\" frameBorder=\"0\" src=\'"+$(this).data("url")+"\'></iframe>");
+        $("#aupModal").modal("show");
     })
-    $("#aups_link").on("click",function(){$(".container.js-spread").css("height", "auto");
-    if($("#aups_panel").length!=0){$("#aups_panel").toggle(); return;}
-    $("#iframe_container").append("<iframe id=\"aups_panel\" style=\"width: 100%; height: 70vh; position: relative; top:0px; padding:0px\" frameBorder=\"0\" src=\'' . $aupEndpoint . '\'></iframe>");}) })
+    
+    $("input[name^=\'terms_and_conditions_\']").on("click", function(){
+        all_enabled = true;
+        $("input[name^=\'terms_and_conditions_\']").each(function(){
+            if(!$(this).is(\':checked\')) {
+                all_enabled = false;
+                return;
+            }
+        })
+        if (all_enabled === true) {
+            $("button[name=\'yes\']").removeAttr("disabled");
+        }
+        else {
+            $("button[name=\'yes\']").attr("disabled","disabled");
+        }
+    })
+   
+})
 </script>';
 
 $this->includeAtTemplateBase('includes/header.php');
@@ -110,12 +124,8 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
     <!--  Form that will be sumbitted on Yes -->
     <form style="display: inline; margin: 0px; padding: 0px" action="<?php
     print htmlspecialchars($this->data['yesTarget']); ?>">
-        <h3 class="text-center" style="margin-top:3em; text-decoration: underline;">
-          <?php
-          print $this->t('{aup:aup:updated_aup_list}') ?>
-        </h3>
-        <div style="font-size: 1em;">
 
+        <div style="font-size: 1em;margin-top:2em">
           <?php
           foreach ($aups as $aup): ?>
               <div class="row aup_rows" style="padding:7px 0px">
@@ -138,7 +148,7 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
           endforeach; ?>
         </div>
 
-        <p style="margin:0em 1em 5em " class="text-center">
+        <p style="margin:1em 1em 5em " class="text-center">
           <?php
           foreach ($this->data['yesData'] as $name => $value) {
             print '<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars(
@@ -146,7 +156,7 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
               ) . '" />';
           }
           ?>
-            <button type="submit" name="yes"
+            <button disabled="disabled" type="submit" name="yes"
                     class="ssp-btn btn ssp-btn__action ssp-btns-container--btn__left text-uppercase" id="yesbutton">
               <?php
               print htmlspecialchars($this->t('{aup:aup:yes}')) ?>
@@ -156,15 +166,15 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
     <p class="text-center" style="margin-top:20px;margin-bottom:50px"><?php
       print $this->t(
         '{aup:aup:updated_aup_more_information}',
-        array('%HERE%' => '<a id="aups_link" onclick="return false;" href="#">here</a>')
+        array('%HERE%' => '<a href="'.$aupListEndpoint.'">here</a>')
       ) ?></p>
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="aupModal" tabindex="-1" role="dialog" aria-labelledby="aupModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="aupModalLabel">Modal title</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

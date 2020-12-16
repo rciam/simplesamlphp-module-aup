@@ -69,7 +69,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
               && $state['Attributes']['eduPersonUniqueId'][0] == 'befd2b9ed8878c542555829cb21da3e25ad91a0f9c56195d7a86a650d19419ab@egi.eu'
               ) {
                   $state['aup:changedAups'] = $changed_aups;
-                  $state['aup:aupListEndpoint'] = str_replace("%rciamUserId%", $state["rciamAttributes"]["userId"]["id"], $this->config['aupEndpoint']);
+                  $state['aup:aupListEndpoint'] = str_replace("%rciamUserId%", $state["rciamAttributes"]["userId"]["id"], $this->config['aupListEndpoint']);
                   $state['aup:aupApiEndpoint'] = $this->config['aupApiEndpoint'];
                   $state['aup:apiUsername'] = $this->config['apiUsername'];
                   $state['aup:apiPassword'] = $this->config['apiPassword'];
@@ -80,7 +80,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
           }
           return;
         } catch (\Exception $e) {
-
+          $this->showException($e);
         }
 
     }
