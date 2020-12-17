@@ -20,30 +20,6 @@ assert('is_array($this->data["yesData"])');
 assert('is_array($this->data["changedAups"])');
 
 // Parse parameters
-if (array_key_exists('name', $this->data['srcMetadata'])) {
-  $srcName = $this->data['srcMetadata']['name'];
-} elseif (array_key_exists('OrganizationDisplayName', $this->data['srcMetadata'])) {
-  $srcName = $this->data['srcMetadata']['OrganizationDisplayName'];
-} else {
-  $srcName = $this->data['srcMetadata']['entityid'];
-}
-
-if (is_array($srcName)) {
-  $srcName = $this->t($srcName);
-}
-
-if (array_key_exists('name', $this->data['dstMetadata'])) {
-  $dstName = $this->data['dstMetadata']['name'];
-} elseif (array_key_exists('OrganizationDisplayName', $this->data['dstMetadata'])) {
-  $dstName = $this->data['dstMetadata']['OrganizationDisplayName'];
-} else {
-  $dstName = $this->data['dstMetadata']['entityid'];
-}
-
-if (is_array($dstName)) {
-  $dstName = $this->t($dstName);
-}
-
 if (array_key_exists('changedAups', $this->data)) {
   $aups = $this->data['changedAups'];
 }
@@ -189,11 +165,4 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
 
 
 <?php
-/*
-if ($this->data['sppp'] !== false) {
-  print "<p>" . htmlspecialchars($this->t('{aup:aup:aup_privacy_policy}')) . " ";
-  print "<a target='_blank' href='" . htmlspecialchars($this->data['sppp']) . "'>" . $dstName . "</a>";
-  print "</p>";
-}*/
-
 $this->includeAtTemplateBase('includes/footer.php');

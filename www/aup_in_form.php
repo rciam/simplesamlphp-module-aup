@@ -32,15 +32,6 @@ $id = $_REQUEST['StateId'];
 /* Restore state */
 $state = SimpleSAML_Auth_State::loadState($id, 'aup_state');
 
-// Get the spEntityId for the privacy policy section
-/*if (array_key_exists('core:SP', $state)) {
-  $spentityid = $state['core:SP'];
-} else if (array_key_exists('saml:sp:State', $state)) {
-  $spentityid = $state['saml:sp:State']['core:SP'];
-} else {
-  $spentityid = 'UNKNOWN';
-}
-*/
 // The user has pressed the yes-button
 // The resumeProcessing function needs a ReturnUrl or a ReturnCall in order to proceed
 if (array_key_exists('yes', $_REQUEST)) {
@@ -72,14 +63,9 @@ if (array_key_exists('yes', $_REQUEST)) {
   }
   SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
 }
-////////////// End of handling users choice
-///
-///
 
 // Make, populate and layout informed failure consent form
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'aup:aup_in_form.tpl.php');
-$t->data['srcMetadata'] = $state['Source'];
-$t->data['dstMetadata'] = $state['Destination'];
 $t->data['yesTarget'] = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
 $t->data['yesData'] = array('StateId' => $id);
 $t->data['changedAups'] = $state['aup:changedAups'];
@@ -88,9 +74,6 @@ $t->show();
 
 function addCoTAndCAgreement($coPersonId, $coTAndCId, $url, $apiUser, $apiPass)
 {
-
-  //$url = "https://aai-dev.egi.eu/registry" . "/co_t_and_c_agreements/add.json";
-
   // Construct my data
   $reqDataArr = array();
   $reqDataArr['RequestType'] = 'CoTAndCAgreements';
@@ -114,7 +97,6 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
       CURLOPT_CUSTOMREQUEST => $method,
       CURLOPT_CONNECTTIMEOUT => 5,
       CURLOPT_RETURNTRANSFER => true,
-      //CURLOPT_USERPWD => 'aupUsrDev' . ":" . 'znu-K#c@3cP=Wd9*',
       CURLOPT_USERPWD => $apiUser . ":" . $apiPass,
     )
   );
@@ -138,9 +120,6 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
       . ": API call failed: HTTP response code: "
       . var_export($http_code, true) . ", error message: '"
       . var_export(curl_error($ch), true) . "'\n";
-    // Close session
-    curl_close($ch);
-    //throw new SimpleSAML_Error_Exception("Failed to communicate with COmanage Registry");
   }
   // Close session
   curl_close($ch);

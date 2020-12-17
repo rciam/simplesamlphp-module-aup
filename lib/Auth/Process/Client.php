@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Authproc filter for retrieving attributes from the AUP and adding them to the list of attributes received from the
- * identity provider.
+ * Authproc filter for informing the user for updated AUP(s) and asking them to re-accept them
+ * in order to proceed
  *
  * Example configuration:
  *
@@ -61,7 +61,6 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             foreach ($state['rciamAttributes']['aup'] as $aup) {
               if ($aup['version'] != $aup['agreed']['version']) {
                   $changed_aups[] = $aup;
-              //  SimpleSAML_Logger::info('[aup] process: USERID CHANGED'. var_export($state["rciamAttributes"]["userId"],true));
               }
             }
             if (
