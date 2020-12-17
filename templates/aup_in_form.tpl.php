@@ -4,8 +4,6 @@
  * Template form for attribute selection.
  *
  * Parameters:
- * - 'srcMetadata': Metadata/configuration for the source.
- * - 'dstMetadata': Metadata/configuration for the destination.
  * - 'yesTarget': Target URL for the yes-button. This URL will receive a POST request.
  * - 'yesData': Parameters which should be included in the yes-request.
  * - 'changedAups': AUPs that have been updated.
@@ -13,8 +11,6 @@
  *
  * @package SimpleSAMLphp
  */
-assert('is_array($this->data["srcMetadata"])');
-assert('is_array($this->data["dstMetadata"])');
 assert('is_string($this->data["yesTarget"])');
 assert('is_array($this->data["yesData"])');
 assert('is_array($this->data["changedAups"])');
