@@ -80,7 +80,9 @@ $(function() {
 $this->includeAtTemplateBase('includes/header.php');
 ?>
 
-
+<?php
+print '<h1 class="text-center" style="padding-bottom: 0.8em; text-decoration: underline">' . $this->t('{aup:aup:updated_aup_notice}') . '</h1>';
+?>
 <?php
 print '<h2 class="text-center">' . $this->t('{aup:aup:updated_aup_title}') . '</h2>';
 ?>
