@@ -8,9 +8,8 @@
  * - 'dstMetadata': Metadata/configuration for the destination.
  * - 'yesTarget': Target URL for the yes-button. This URL will receive a POST request.
  * - 'yesData': Parameters which should be included in the yes-request.
- * - 'logoutLink': Where to redirect if the user aborts.
- * - 'logoutData': The Data to post to the logout link.
- * - 'sppp': URL to the privacy policy of the destination, or FALSE.
+ * - 'changedAups': AUPs that have been updated.
+ * - 'aupListEndpoint': AUP List Endpoint showing all AUPs for user.
  *
  * @package SimpleSAMLphp
  */
@@ -19,13 +18,8 @@ assert('is_array($this->data["dstMetadata"])');
 assert('is_string($this->data["yesTarget"])');
 assert('is_array($this->data["yesData"])');
 assert('is_array($this->data["changedAups"])');
-//assert('is_string($this->data["skipLink"])');
-//assert('is_array($this->data["skipData"])');
-
-assert('$this->data["sppp"] === false || is_string($this->data["sppp"])');
 
 // Parse parameters
-
 if (array_key_exists('name', $this->data['srcMetadata'])) {
   $srcName = $this->data['srcMetadata']['name'];
 } elseif (array_key_exists('OrganizationDisplayName', $this->data['srcMetadata'])) {
@@ -58,7 +52,9 @@ if (array_key_exists('aupListEndpoint', $this->data)) {
 }
 
 $this->data['jquery'] = array('core' => true, 'ui' => true, 'css' => true);
-$this->data['head'] = '<style type="text/css">
+$this->data['head'] = header("Expires: Thu, 19 Nov 1981 08:52:00 GMT"). //Date in the past in order not to keep cache if someone goes back to that page
+header("Cache-Control: no-store, no-cache, must-revalidate"). //HTTP/1.1 
+'<style type="text/css">
 .aup_content{
    cursor: pointer;
 }
@@ -75,12 +71,14 @@ height:100%;
 
 </style>
 <script type="text/javascript">
+
 $(function() {
     height = $("#content").height() + $(".header").height();
     $("body").prepend("<div id=\"loader\" style=\"height:"+height+"px\"><div class=\"sk-circle\"><div class=\"sk-circle1 sk-child\"></div><div class=\"sk-circle2 sk-child\"></div><div class=\"sk-circle3 sk-child\"></div><div class=\"sk-circle4 sk-child\"></div><div class=\"sk-circle5 sk-child\"></div><div class=\"sk-circle6 sk-child\"></div><div class=\"sk-circle7 sk-child\"></div><div class=\"sk-circle8 sk-child\"></div><div class=\"sk-circle9 sk-child\"></div><div class=\"sk-circle10 sk-child\"></div><div class=\"sk-circle11 sk-child\"></div><div class=\"sk-circle12 sk-child\"></div></div></div>")
     
     $("#yesbutton").on("click", function(){
         $("#loader").show();
+        
     })
     $(".aup_content").on("click", function(){
         $("#aupModal .modal-header").html("<h2>"+$(this).data("description")+"</h2>")  
@@ -156,7 +154,7 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
               ) . '" />';
           }
           ?>
-            <button disabled="disabled" type="submit" name="yes"
+            <button type="submit" name="yes" disabled="disabled"
                     class="ssp-btn btn ssp-btn__action ssp-btns-container--btn__left text-uppercase" id="yesbutton">
               <?php
               print htmlspecialchars($this->t('{aup:aup:yes}')) ?>
