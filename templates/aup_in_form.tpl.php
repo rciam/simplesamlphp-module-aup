@@ -81,7 +81,7 @@ $this->includeAtTemplateBase('includes/header.php');
 ?>
 
 <?php
-print '<h1 class="text-center" style="padding-bottom: 0.8em; text-decoration: underline">' . $this->t('{aup:aup:updated_aup_notice}') . '</h1>';
+print '<h1 class="text-center" style="padding-bottom: 0.8em; font-size: xx-large; font-weight: 700;">' . $this->t('{aup:aup:updated_aup_notice}') . '</h1>';
 ?>
 <?php
 print '<h2 class="text-center">' . $this->t('{aup:aup:updated_aup_title}') . '</h2>';
@@ -98,36 +98,35 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
     print htmlspecialchars($this->data['yesTarget']); ?>">
 
         <div style="font-size: 1em;margin-top:2em">
-          <?php
-          foreach ($aups as $aup): ?>
-              <div class="row aup_rows" style="padding:7px 0px">
-                  <div class="col-lg-5 col-lg-offset-2 col-md-offset-2 col-md-5 col-sm-7">
-                      <h3>
-                          <a class="aup_content"
-                             data-description="<?php print $aup['description']; ?>"
-                             data-url="<?php print $aup['url']; ?>">
-                            <?php print $aup['description']; ?>
-                          </a>
-                      </h3>
+              <?php foreach ($aups as $aup): ?>
+                  <div class="row aup_rows" style="padding:7px 0px">
+                      <div class="col-lg-5 col-lg-offset-2 col-md-offset-2 col-md-5 col-sm-7">
+                          <h3>
+                              <a class="aup_content"
+                                 data-description="<?php print $aup['description']; ?>"
+                                 data-url="<?php print $aup['url']; ?>">
+                                <?php print $aup['description']; ?>
+                              </a>
+                          </h3>
+                      </div>
+                      <div class="col-lg-5 col-md-5 col-sm-5">
+                          <h3>
+                              <input type="checkbox" name="terms_and_conditions_<?php
+                            print $aup['id'] ?>"/>
+                              <span style="font-size: 0.9em"> I Agree</span>
+                          </h3>
+                      </div>
                   </div>
-                  <div class="col-lg-5 col-md-5 col-sm-5"><h3><input type="checkbox"
-                                                                     name="terms_and_conditions_<?php
-                                                                     print $aup['id'] ?>"/><span
-                                  style="font-size: 0.9em"> I Agree</span></h3>
-                  </div>
-              </div>
-          <?php
-          endforeach; ?>
+              <?php endforeach; ?>
         </div>
-
         <p style="margin:1em 1em 5em " class="text-center">
-          <?php
-          foreach ($this->data['yesData'] as $name => $value) {
-            print '<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars(
-                $value
-              ) . '" />';
-          }
-          ?>
+            <?php
+              foreach ($this->data['yesData'] as $name => $value) {
+                print '<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars(
+                    $value
+                  ) . '" />';
+              }
+              ?>
             <button type="submit" name="yes" disabled="disabled"
                     class="ssp-btn btn ssp-btn__action ssp-btns-container--btn__left text-uppercase" id="yesbutton">
               <?php
@@ -139,7 +138,8 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
       print $this->t(
         '{aup:aup:updated_aup_more_information}',
         array('%HERE%' => '<a href="'.$aupListEndpoint.'">here</a>')
-      ) ?></p>
+      ) ?>
+    </p>
     <!-- Modal -->
     <div class="modal fade" id="aupModal" tabindex="-1" role="dialog" aria-labelledby="aupModalLabel"
          aria-hidden="true">
@@ -160,7 +160,5 @@ print '<div class="text-center" style="font-size:1.2em; margin-top:20px; line-he
             </div>
         </div>
     </div>
-
-
 <?php
 $this->includeAtTemplateBase('includes/footer.php');

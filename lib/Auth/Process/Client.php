@@ -59,27 +59,26 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             $changed_aups = array();
 
             foreach ($state['rciamAttributes']['aup'] as $aup) {
-              if ($aup['version'] != $aup['agreed']['version']) {
-                  $changed_aups[] = $aup;
-              }
+                if ($aup['version'] != $aup['agreed']['version']) {
+                    $changed_aups[] = $aup;
+                }
             }
-            if (
-              !empty($changed_aups)
+            if (!empty($changed_aups)
               && $state['Attributes']['eduPersonUniqueId'][0] == 'befd2b9ed8878c542555829cb21da3e25ad91a0f9c56195d7a86a650d19419ab@egi.eu'
               ) {
-                  $state['aup:changedAups'] = $changed_aups;
-                  $state['aup:aupListEndpoint'] = str_replace("%rciamUserId%", $state["rciamAttributes"]["userId"]["id"], $this->config['aupListEndpoint']);
-                  $state['aup:aupApiEndpoint'] = $this->config['aupApiEndpoint'];
-                  $state['aup:apiUsername'] = $this->config['apiUsername'];
-                  $state['aup:apiPassword'] = $this->config['apiPassword'];
+                    $state['aup:changedAups'] = $changed_aups;
+                    $state['aup:aupListEndpoint'] = str_replace("%rciamUserId%", $state["rciamAttributes"]["userId"]["id"], $this->config['aupListEndpoint']);
+                    $state['aup:aupApiEndpoint'] = $this->config['aupApiEndpoint'];
+                    $state['aup:apiUsername'] = $this->config['apiUsername'];
+                    $state['aup:apiPassword'] = $this->config['apiPassword'];
 
-                  $id = SimpleSAML_Auth_State::saveState($state, 'aup_state');
-                  $url = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
-                  \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
+                    $id = SimpleSAML_Auth_State::saveState($state, 'aup_state');
+                    $url = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
+                    \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
           }
           return;
         } catch (\Exception $e) {
-          $this->showException($e);
+            $this->showException($e);
         }
 
     }
