@@ -4,11 +4,11 @@ SimpleSAMLphp module for handling AUP information
 ## Configuration
 
 The following configuration options are available:
-  - `aupApiEndpoint`: The API endpoint for storing aup agreements
-  - `aupListEndpoint`: The endpoint for aups list page of the user
-  - `apiUsername`: The username of the API user
-  - `apiPassword`: The password of the API user
-  - `spBlacklist`: An array of strings that contains the SPs that the module will skip to process or can be empty.
+  - `aupApiEndpoint`: Required, the API endpoint for storing aup agreements
+  - `aupListEndpoint`: Required, the endpoint for aups list page of the user
+  - `apiUsername`: Required, the username of the API user
+  - `apiPassword`: Required, the password of the API user
+  - `spBlacklist`: Optional, an array of strings that contains the SPs that the module will skip to process or can be empty.
 
 ### Example configuration
 
@@ -17,10 +17,10 @@ The following configuration options are available:
         ...
         '82' => array(
              'class' => 'aup:Client',
-             'aupApiEndpoint' => '',
-             'aupListEndpoint' => '',
-             'apiUsername' => '',
-             'apiPassword' => '',
+             'aupApiEndpoint' => 'https://comanage.example.org/registry/co_t_and_c_agreements/add.json',
+             'aupListEndpoint' => 'https://comanage.example.org/registry/co_terms_and_conditions/review/copersonid:%registryUserId%',
+             'apiUsername' => 'bob',
+             'apiPassword' => 'secret',
              'spBlacklist' => array(),
         ),
 ```

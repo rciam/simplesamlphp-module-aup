@@ -36,11 +36,11 @@ if (array_key_exists('yes', $_REQUEST)) {
     $url = $state['aup:aupApiEndpoint'];
     foreach($state['aup:changedAups'] as $aup) {
         SimpleSAML_Logger::debug("[aup] Changed AUPS:". $aup['id']);
-        SimpleSAML_Logger::debug("[aup] User Id:".   $state["rciamAttributes"]["userId"]["id"]);
+        SimpleSAML_Logger::debug("[aup] User Id:".   $state["rciamAttributes"]["registryUserId"]);
 
         if(!empty($_REQUEST['terms_and_conditions_'.$aup['id']])){
             // Make the post requests
-            addCoTAndCAgreement($state["rciamAttributes"]["userId"]["id"], $aup['id'], $url, $state['aup:apiUsername'], $state['aup:apiPassword']);
+            addCoTAndCAgreement($state["rciamAttributes"]["registryUserId"], $aup['id'], $url, $state['aup:apiUsername'], $state['aup:apiPassword']);
         }
     }
     if (array_key_exists('aup:changedAups', $state)) {

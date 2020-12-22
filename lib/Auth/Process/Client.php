@@ -31,8 +31,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             'aupApiEndpoint',
             'aupListEndpoint',
             'apiUsername',
-            'apiPassword',
-            'spBlacklist'
+            'apiPassword',         
         );
         foreach ($params as $param) {
             if (!array_key_exists($param, $config)) {
@@ -41,6 +40,15 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             }
             $this->config[$param] = $config[$param];
         }
+
+        $optionals = array(
+            'spBlacklist'
+        );
+        foreach ($optionals as $optional) {
+            if(!empty($config[$optional])) {
+                $this->config[$optional] = $config[$optional];
+            }
+        }
     }
 
     /**
@@ -48,8 +56,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
      */
     public function process(&$state)
     {
-        //SimpleSAML_Logger::debug("[aup] process: blacklisted SPs ". var_export($this->config['spBlacklist'], true));
-        if (isset($state['SPMetadata']['entityid']) && in_array($state['SPMetadata']['entityid'], $this->config['spBlacklist'], true)) {
+        if (!empty($this->config['spBlacklist']) && isset($state['SPMetadata']['entityid']) && in_array($state['SPMetadata']['entityid'], $this->config['spBlacklist'], true)) {
             SimpleSAML_Logger::debug("[aup] process: Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
             return;
         }
@@ -65,7 +72,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             }
             if (!empty($changed_aups)) {
                     $state['aup:changedAups'] = $changed_aups;
-                    $state['aup:aupListEndpoint'] = str_replace("%rciamUserId%", $state["rciamAttributes"]["userId"]["id"], $this->config['aupListEndpoint']);
+                    $state['aup:aupListEndpoint'] = str_replace("%registryUserId%", $state["rciamAttributes"]["registryUserId"], $this->config['aupListEndpoint']);
                     $state['aup:aupApiEndpoint'] = $this->config['aupApiEndpoint'];
                     $state['aup:apiUsername'] = $this->config['apiUsername'];
                     $state['aup:apiPassword'] = $this->config['apiPassword'];
