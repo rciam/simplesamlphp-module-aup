@@ -9,11 +9,11 @@
  *    'authproc' => array(
  *       ...
  *       '82' => array(
- *            'class' => 'aup:Client',
- *            'aupApiEndpoint' => '',
- *            'aupListEndpoint' => '',
- *            'apiUsername' => '',
- *            'apiPassword' => '',
+ *            class' => 'aup:Client',
+ *            'aupApiEndpoint' => 'https://comanage.example.org/registry/co_t_and_c_agreements/add.json',
+ *            'aupListEndpoint' => 'https://comanage.example.org/registry/co_terms_and_conditions/review/copersonid:%registryUserId%',
+ *            'apiUsername' => 'bob',
+ *            'apiPassword' => 'secret',
  *            'spBlacklist' => array(),
  *       ),
  *
