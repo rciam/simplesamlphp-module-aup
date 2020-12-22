@@ -111,17 +111,17 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
 
     // Check for error
     if ($http_code !== 200 && $http_code !== 201 && $http_code !== 204 && $http_code !== 302 && $http_code !== 404) {
-        echo "[aup] http: method=" // TODO error logging
-          . var_export($method, true) . ", url=" . var_export($url, true)
-          . ", data=" . var_export($data, true)
-          . ": API call failed: HTTP response code: "
-          . var_export($http_code, true) . ", error message: '"
-          . var_export(curl_error($ch), true) . "'\n";
+    SimpleSAML_Logger::error("[aup] save acceptance of aup failed. http: method=" // TODO error logging
+        . var_export($method, true) . ", url=" . var_export($url, true)
+        . ", data=" . var_export($data, true)
+        . ": API call failed: HTTP response code: "
+        . var_export($http_code, true) . ", error message: '"
+        . var_export(curl_error($ch), true) . "'\n");
     }
     // Close session
     curl_close($ch);
     $result = json_decode($response);
-    SimpleSAML_Logger::error("[aup] api call for renew AUP http: result="
+    SimpleSAML_Logger::debug("[aup] api call for renew AUP http: result="
         . var_export($result, true));
     assert('json_last_error()===JSON_ERROR_NONE');
     return $result;
