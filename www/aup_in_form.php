@@ -111,7 +111,7 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
 
     // Check for error
     if ($http_code !== 200 && $http_code !== 201 && $http_code !== 204 && $http_code !== 302 && $http_code !== 404) {
-    SimpleSAML_Logger::error("[aup] save acceptance of aup failed. http: method=" // TODO error logging
+        SimpleSAML_Logger::error("[aup] save acceptance of aup failed. http: method=" // TODO error logging
         . var_export($method, true) . ", url=" . var_export($url, true)
         . ", data=" . var_export($data, true)
         . ": API call failed: HTTP response code: "
