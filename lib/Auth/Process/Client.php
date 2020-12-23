@@ -70,7 +70,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
                     $changed_aups[] = $aup;
                 }
             }
-            if (!empty($changed_aups)) {
+            if (!empty($changed_aups) && !empty($state["rciamAttributes"]) && !empty($state["rciamAttributes"]["registryUserId"])) {
                     $state['aup:changedAups'] = $changed_aups;
                     $state['aup:aupListEndpoint'] = str_replace("%registryUserId%", $state["rciamAttributes"]["registryUserId"], $this->config['aupListEndpoint']);
                     $state['aup:aupApiEndpoint'] = $this->config['aupApiEndpoint'];
