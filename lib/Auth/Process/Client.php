@@ -14,16 +14,15 @@
  *            'aupListEndpoint' => '',
  *            'apiUsername' => '',
  *            'apiPassword' => '',
+ *            'userIdAttribute' => '',
  *            'spBlacklist' => array(),
- *            'eduPersonUniqueIdBlacklist' => array()
+ *            'userIdBlacklist' => array()
  *       ),
  *
  * @author Nick Mastoris <nmastoris@admin.grnet.gr>
  */
 class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
 {
-    // List of SP entity IDs that should be excluded from this filter.
-    private $spBlacklist = array();
 
     public function __construct($config, $reserved)
     {
@@ -32,7 +31,7 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             'aupApiEndpoint',
             'aupListEndpoint',
             'apiUsername',
-            'apiPassword',         
+            'apiPassword'
         );
         foreach ($params as $param) {
             if (!array_key_exists($param, $config)) {
@@ -43,8 +42,9 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
         }
 
         $optionals = array(
+            'userIdAttribute',
             'spBlacklist',
-            'eduPersonUniqueIdBlacklist'
+            'userIdBlacklist'
         );
         foreach ($optionals as $optional) {
             if(!empty($config[$optional])) {
@@ -63,12 +63,12 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             return;
         }
         // Check if user is in blacklist
-        if(!empty($this->config['eduPersonUniqueIdBlacklist']) &&  !empty(array_intersect($state['Attributes']['eduPersonUniqueId'], $this->config['eduPersonUniqueIdBlacklist']))) {
+        if(!empty($this->config['userIdAttribute']) && !empty($this->config['userIdBlacklist']) &&  !empty(array_intersect($state['Attributes'][$this->config['userIdAttribute']], $this->config['userIdBlacklist']))) {
             return;
         }
         try {
-            SimpleSAML_Logger::info('[aup] process: eduPersonUniqueId'. var_export($state['Attributes']['eduPersonUniqueId'],true));
-            // Check if there are updated aup(s)
+            SimpleSAML_Logger::info('[aup] process: ' . $this->config['userIdAttribute'] . ' ' . var_export($state['Attributes'][$this->config['userIdAttribute']],true));
+            // Check if we have an updated aup
             $changed_aups = array();
 
             foreach ($state['rciamAttributes']['aup'] as $aup) {
