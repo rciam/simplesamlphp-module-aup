@@ -8,7 +8,8 @@ The following configuration options are available:
   - `aupListEndpoint`: Required, the endpoint for aups list page of the user
   - `apiUsername`: Required, the username of the API user
   - `apiPassword`: Required, the password of the API user
-  - `spBlacklist`: Optional, an array of strings that contains the SPs that the module will skip to process or can be empty.
+  - `spBlacklist`: Optional, an array of strings that contains the SPs that the module will skip the process.
+  - `eduPersonUniqueIdBlacklist`: Optional, an array of strings that contains the eduPersonUniqueIds thath the module will skip the aup process.
 
 ### Example configuration
 
@@ -22,6 +23,7 @@ The following configuration options are available:
              'apiUsername' => '',
              'apiPassword' => '',
              'spBlacklist' => array(),
+             'eduPersonUniqueIdBlacklist' => array()
         ),
 ```
 

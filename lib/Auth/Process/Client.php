@@ -9,12 +9,13 @@
  *    'authproc' => array(
  *       ...
  *       '82' => array(
- *            class' => 'aup:Client',
+ *            'class' => 'aup:Client',
  *            'aupApiEndpoint' => '',
  *            'aupListEndpoint' => '',
  *            'apiUsername' => '',
  *            'apiPassword' => '',
  *            'spBlacklist' => array(),
+ *            'eduPersonUniqueIdBlacklist' => array()
  *       ),
  *
  * @author Nick Mastoris <nmastoris@admin.grnet.gr>
@@ -42,7 +43,8 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
         }
 
         $optionals = array(
-            'spBlacklist'
+            'spBlacklist',
+            'eduPersonUniqueIdBlacklist'
         );
         foreach ($optionals as $optional) {
             if(!empty($config[$optional])) {
@@ -60,9 +62,13 @@ class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
             SimpleSAML_Logger::debug("[aup] process: Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
             return;
         }
+        // Check if user is in blacklist
+        if(!empty($this->config['eduPersonUniqueIdBlacklist']) &&  !empty(array_intersect($state['Attributes']['eduPersonUniqueId'], $this->config['eduPersonUniqueIdBlacklist']))) {
+            return;
+        }
         try {
             SimpleSAML_Logger::info('[aup] process: eduPersonUniqueId'. var_export($state['Attributes']['eduPersonUniqueId'],true));
-            // Check if we have an updated aup
+            // Check if there are updated aup(s)
             $changed_aups = array();
 
             foreach ($state['rciamAttributes']['aup'] as $aup) {
