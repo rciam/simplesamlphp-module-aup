@@ -9,7 +9,7 @@
  *    'authproc' => array(
  *       ...
  *       '82' => array(
- *            'class' => 'aup:UpdateAUP',
+ *            'class' => 'aup:Client',
  *            'aupApiEndpoint' => '',
  *            'aupListEndpoint' => '',
  *            'apiUsername' => '',
@@ -21,7 +21,7 @@
  *
  * @author Nick Mastoris <nmastoris@admin.grnet.gr>
  */
-class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
+class sspmod_aup_Auth_Process_Client extends SimpleSAML_Auth_ProcessingFilter
 {
 
     public function __construct($config, $reserved)
