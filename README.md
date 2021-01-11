@@ -18,7 +18,7 @@ The following configuration options are available:
      'authproc' => array(
         ...
         '82' => array(
-             'class' => 'aup:Client',
+             'class' => 'aup:UpdateAUP',
              'aupApiEndpoint' => '',
              'aupListEndpoint' => '',
              'apiUsername' => '',
