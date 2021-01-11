@@ -15,18 +15,18 @@ The following configuration options are available for the UpdateAUP filter which
 ### Example configuration
 
 ```
-     'authproc' => array(
+     'authproc' => [
         ...
-        '82' => array(
+        '82' => [
              'class' => 'aup:UpdateAUP',
              'aupApiEndpoint' => '',
              'aupListEndpoint' => '',
              'apiUsername' => '',
              'apiPassword' => '',
              'userIdAttribute' => '',
-             'spBlacklist' => array(),
-             'userIdBlacklist' => array()
-        ),
+             'spBlacklist' => [],
+             'userIdBlacklist' => []
+        ],
 ```
 
 ## Compatibility matrix
@@ -36,6 +36,7 @@ This table matches the module version with the supported SimpleSAMLphp version.
 | Module |  SimpleSAMLphp |
 |:------:|:--------------:|
 | v1.x   | v1.14          |
+| v2.x   | v1.17+         |
 
 # License
 
