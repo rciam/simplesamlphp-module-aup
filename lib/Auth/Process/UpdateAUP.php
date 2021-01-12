@@ -67,7 +67,7 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
             return;
         }
         try {
-            SimpleSAML_Logger::info('[aup] process: ' . $this->config['userIdAttribute'] . ' ' . var_export($state['Attributes'][$this->config['userIdAttribute']],true));
+            SimpleSAML_Logger::debug('[aup] process: ' . $this->config['userIdAttribute'] . ' ' . var_export($state['Attributes'][$this->config['userIdAttribute']],true));
             // Check if there are updated aup(s)
             $changed_aups = array();
 
