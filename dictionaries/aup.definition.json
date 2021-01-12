@@ -1,0 +1,17 @@
+{
+	"yes": {
+		"en": "Continue"
+	},
+	"updated_aup_notice": {
+		"en": "Important Notice"
+	},
+	"updated_aup_title": {
+		"en": "We have updated our Acceptable Use Policy and Conditions of Use (AUP)."
+	},
+	"updated_aup_description": {
+		"en": "In order to continue using the service, you must review and agree to the updated AUP document(s) below by clicking on the document name and ticking the \"I Agree\" checkbox."
+	},
+	"updated_aup_more_information": {
+		"en": "For more information click %HERE% to review all Acceptable Use Policies"
+	}
+}
