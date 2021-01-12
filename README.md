@@ -3,14 +3,14 @@ SimpleSAMLphp module for handling AUP information
 
 ## Configuration
 
-The following configuration options are available:
-  - `aupApiEndpoint`: Required, the API endpoint for storing aup agreements
-  - `aupListEndpoint`: Required, the endpoint for aups list page of the user
+The following configuration options are available for the UpdateAUP filter which allows users to update agreement to relevant AUPs:
+  - `aupApiEndpoint`: Required, the API endpoint for storing AUP agreements
+  - `aupListEndpoint`: Required, the endpoint for AUPs list page of the user
   - `apiUsername`: Required, the username of the API user
   - `apiPassword`: Required, the password of the API user
   - `userIdAttribute` : Optional, a string containing the name of the attribute whose value will be used to check if it is in userIdBlacklist.
   - `spBlacklist`: Optional, an array of strings that contains the SPs that the module will skip the process.
-  - `userIdBlacklist`: Optional, an array of strings that contains the userIds for which the module will skip the aup process. In order to be activated a value is required to userIdAttribute option.
+  - `userIdBlacklist`: Optional, an array of strings that contains the userIds for which the module will skip the AUP process. In order to be activated a value is required to userIdAttribute option.
 
 ### Example configuration
 
