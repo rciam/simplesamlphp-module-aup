@@ -31,16 +31,20 @@ header("Cache-Control: no-store, no-cache, must-revalidate"). //HTTP/1.1
    cursor: pointer;
 }
 .aup_rows:nth-child(odd) {
-background: #fafafa; 
+    background: #fafafa; 
 }
 
 .aup_rows:nth-child(even) {
-background: #ffffff;
+    background: #ffffff;
 }
 html, body {
-height:100%;
+    height:100%;
 }
-
+.ssp-btn__action[disabled]:hover {
+    background-color: #599adb; 
+    color: #fff;
+    border-color: transparent;
+}
 </style>
 <script type="text/javascript">
 
