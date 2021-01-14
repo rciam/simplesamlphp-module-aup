@@ -59,15 +59,22 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
     public function process(&$state)
     {
         if (!empty($this->config['spBlacklist']) && isset($state['SPMetadata']['entityid']) && in_array($state['SPMetadata']['entityid'], $this->config['spBlacklist'], true)) {
-            SimpleSAML_Logger::debug("[aup] process: Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
+            SimpleSAML_Logger::debug("[aup:UpdateAUP] Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
             return;
         }
         // Check if user is in blacklist
-        if(!empty($this->config['userIdAttribute']) && !empty($this->config['userIdBlacklist']) &&  !empty(array_intersect($state['Attributes'][$this->config['userIdAttribute']], $this->config['userIdBlacklist']))) {
+        if ((!empty($this->config['userIdAttribute']) && !empty($state['Attributes'][$this->config['userIdAttribute']]) && !empty($this->config['userIdBlacklist']) && !empty(array_intersect(
+            $state['Attributes'][$this->config['userIdAttribute']],
+            $this->config['userIdBlacklist'])))) {
+            SimpleSAML_Logger::debug("[aup:UpdateAUP] Skipping blacklisted user with id " . var_export($state['Attributes'][$this->config['userIdAttribute']], true));
+            return;
+        }
+        // Check if $state['rciamAttributes']['aup'] is empty
+        if (empty($state['rciamAttributes']['aup'])) {
+            SimpleSAML_Logger::debug("[aup:UpdateAUP] No AUP information found in state - skipping");
             return;
         }
         try {
-            SimpleSAML_Logger::debug('[aup] process: ' . $this->config['userIdAttribute'] . ' ' . var_export($state['Attributes'][$this->config['userIdAttribute']],true));
             // Check if there are updated aup(s)
             $changed_aups = array();
 
