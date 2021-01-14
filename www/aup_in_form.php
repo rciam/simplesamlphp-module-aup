@@ -19,24 +19,24 @@
  * so this is just to make sure.
  */
 session_cache_limiter('nocache');
-$globalConfig = SimpleSAML_Configuration::getInstance();
+$globalConfig = SimpleSAML\Configuration::getInstance();
 if (!array_key_exists('StateId', $_REQUEST)) {
-    throw new SimpleSAML_Error_BadRequest(
+    throw new SimpleSAML\Error\BadRequest(
       'Missing required StateId query parameter.'
     );
 }
 $id = $_REQUEST['StateId'];
 /* Restore state */
-$state = SimpleSAML_Auth_State::loadState($id, 'aup_state');
+$state = SimpleSAML\Auth\State::loadState($id, 'aup_state');
 
 // The user has pressed the yes-button
 // The resumeProcessing function needs a ReturnUrl or a ReturnCall in order to proceed
 if (array_key_exists('yes', $_REQUEST)) {
-    SimpleSAML_Logger::debug("[aup] REQUEST". var_export($_REQUEST, true));
+    SimpleSAML\Logger::debug("[aup] REQUEST". var_export($_REQUEST, true));
     $url = $state['aup:aupApiEndpoint'];
     foreach($state['aup:changedAups'] as $aup) {
-        SimpleSAML_Logger::debug("[aup] Changed AUPS:". $aup['id']);
-        SimpleSAML_Logger::debug("[aup] User Id:".   $state["rciamAttributes"]["registryUserId"]);
+        SimpleSAML\Logger::debug("[aup] Changed AUPS:". $aup['id']);
+        SimpleSAML\Logger::debug("[aup] User Id:".   $state["rciamAttributes"]["registryUserId"]);
 
         if(!empty($_REQUEST['terms_and_conditions_'.$aup['id']])){
             // Make the post requests
@@ -58,12 +58,12 @@ if (array_key_exists('yes', $_REQUEST)) {
     if (array_key_exists('aup:apiPassword', $state)) {
         unset($state['aup:aupPassword']);
     }
-    SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+    SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
 }
 
 // Make, populate and layout informed failure consent form
-$t = new SimpleSAML_XHTML_Template($globalConfig, 'aup:aup_in_form.tpl.php');
-$t->data['yesTarget'] = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
+$t = new SimpleSAML\XHTML\Template($globalConfig, 'aup:aup_in_form.tpl.php');
+$t->data['yesTarget'] = SimpleSAML\Module::getModuleURL('aup/aup_in_form.php');
 $t->data['yesData'] = array('StateId' => $id);
 $t->data['changedAups'] = $state['aup:changedAups'];
 $t->data['aupListEndpoint'] = $state['aup:aupListEndpoint'];
@@ -111,7 +111,7 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
 
     // Check for error
     if ($http_code !== 200 && $http_code !== 201 && $http_code !== 204 && $http_code !== 302 && $http_code !== 404) {
-        SimpleSAML_Logger::error("[aup] save acceptance of aup failed. http: method=" // TODO error logging
+        SimpleSAML\Logger::error("[aup] save acceptance of aup failed. http: method=" // TODO error logging
         . var_export($method, true) . ", url=" . var_export($url, true)
         . ", data=" . var_export($data, true)
         . ": API call failed: HTTP response code: "
@@ -121,7 +121,7 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
     // Close session
     curl_close($ch);
     $result = json_decode($response);
-    SimpleSAML_Logger::debug("[aup] api call for renew AUP http: result="
+    SimpleSAML\Logger::debug("[aup] api call for renew AUP http: result="
         . var_export($result, true));
     assert('json_last_error()===JSON_ERROR_NONE');
     return $result;
