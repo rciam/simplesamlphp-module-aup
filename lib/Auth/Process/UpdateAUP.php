@@ -6,22 +6,24 @@
  *
  * Example configuration:
  *
- *    'authproc' => array(
+ *    'authproc' => [
  *       ...
- *       '82' => array(
+ *       '82' => [
  *            'class' => 'aup:UpdateAUP',
  *            'aupApiEndpoint' => '',
  *            'aupListEndpoint' => '',
  *            'apiUsername' => '',
  *            'apiPassword' => '',
  *            'userIdAttribute' => '',
- *            'spBlacklist' => array(),
- *            'userIdBlacklist' => array()
- *       ),
+ *            'spBlacklist' => [],
+ *            'userIdBlacklist' => []
+ *       ],
  *
  * @author Nick Mastoris <nmastoris@admin.grnet.gr>
  */
-class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
+namespace SimpleSAML\Module\aup\Auth\Process;
+
+class UpdateAUP extends SimpleSAML\Auth\ProcessingFilter
 {
 
     public function __construct($config, $reserved)
@@ -35,7 +37,7 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
         );
         foreach ($params as $param) {
             if (!array_key_exists($param, $config)) {
-                throw new SimpleSAML_Error_Exception(
+                throw new \SimpleSAML\Error\Exception(
                     'Missing required configuration parameter: ' .$param);
             }
             $this->config[$param] = $config[$param];
@@ -59,19 +61,19 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
     public function process(&$state)
     {
         if (!empty($this->config['spBlacklist']) && isset($state['SPMetadata']['entityid']) && in_array($state['SPMetadata']['entityid'], $this->config['spBlacklist'], true)) {
-            SimpleSAML_Logger::debug("[aup:UpdateAUP] Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
+            SimpleSAML\Logger::debug("[aup:UpdateAUP] Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
             return;
         }
         // Check if user is in blacklist
         if ((!empty($this->config['userIdAttribute']) && !empty($state['Attributes'][$this->config['userIdAttribute']]) && !empty($this->config['userIdBlacklist']) && !empty(array_intersect(
             $state['Attributes'][$this->config['userIdAttribute']],
             $this->config['userIdBlacklist'])))) {
-            SimpleSAML_Logger::debug("[aup:UpdateAUP] Skipping blacklisted user with id " . var_export($state['Attributes'][$this->config['userIdAttribute']], true));
+            SimpleSAML\Logger::debug("[aup:UpdateAUP] Skipping blacklisted user with id " . var_export($state['Attributes'][$this->config['userIdAttribute']], true));
             return;
         }
         // Check if $state['rciamAttributes']['aup'] is empty
         if (empty($state['rciamAttributes']['aup'])) {
-            SimpleSAML_Logger::debug("[aup:UpdateAUP] No AUP information found in state - skipping");
+            SimpleSAML\Logger::debug("[aup:UpdateAUP] No AUP information found in state - skipping");
             return;
         }
         try {
@@ -90,8 +92,8 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
                     $state['aup:apiUsername'] = $this->config['apiUsername'];
                     $state['aup:apiPassword'] = $this->config['apiPassword'];
 
-                    $id = SimpleSAML_Auth_State::saveState($state, 'aup_state');
-                    $url = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
+                    $id = SimpleSAML\Auth\State::saveState($state, 'aup_state');
+                    $url = SimpleSAML\Module::getModuleURL('aup/aup_in_form.php');
                     \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
           }
           return;
@@ -107,8 +109,8 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
       */
     private function showException($e)
     {
-        $globalConfig = SimpleSAML_Configuration::getInstance();
-        $t = new SimpleSAML_XHTML_Template($globalConfig, 'aup:exception.tpl.php');
+        $globalConfig = SimpleSAML\Configuration::getInstance();
+        $t = new SimpleSAML\XHTML\Template($globalConfig, 'aup:exception.tpl.php');
         $t->data['e'] = $e->getMessage();
         $t->show();
         exit();
