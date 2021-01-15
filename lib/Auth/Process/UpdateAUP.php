@@ -79,7 +79,7 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
             $changed_aups = array();
 
             foreach ($state['rciamAttributes']['aup'] as $aup) {
-                if (!empty($aup['agreed']) && $aup['version'] != $aup['agreed']['version']) {
+                if (empty($aup['agreed']) || $aup['version'] != $aup['agreed']['version']) {
                     $changed_aups[] = $aup;
                 }
             }
