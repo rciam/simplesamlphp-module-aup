@@ -14,6 +14,7 @@
  *            'aupListEndpoint' => '',
  *            'apiUsername' => '',
  *            'apiPassword' => '',
+ *            'apiTimeout' => 15,
  *            'userIdAttribute' => '',
  *            'spBlacklist' => array(),
  *            'userIdBlacklist' => array()
@@ -26,6 +27,9 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
 
     public function __construct($config, $reserved)
     {
+        // Default value for api timeout
+        $this->config['apiTimeout'] = 15;
+
         parent::__construct($config, $reserved);
         $params = array(
             'aupApiEndpoint',
@@ -44,7 +48,8 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
         $optionals = array(
             'userIdAttribute',
             'spBlacklist',
-            'userIdBlacklist'
+            'userIdBlacklist',
+            'apiTimeout'
         );
         foreach ($optionals as $optional) {
             if(!empty($config[$optional])) {
@@ -89,7 +94,8 @@ class sspmod_aup_Auth_Process_UpdateAUP extends SimpleSAML_Auth_ProcessingFilter
                     $state['aup:aupApiEndpoint'] = $this->config['aupApiEndpoint'];
                     $state['aup:apiUsername'] = $this->config['apiUsername'];
                     $state['aup:apiPassword'] = $this->config['apiPassword'];
-
+                    $state['aup:apiTimeout'] = $this->config['apiTimeout'];
+                    
                     $id = SimpleSAML_Auth_State::saveState($state, 'aup_state');
                     $url = SimpleSAML_Module::getModuleURL('aup/aup_in_form.php');
                     \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));

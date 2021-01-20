@@ -8,6 +8,7 @@ The following configuration options are available for the UpdateAUP filter which
   - `aupListEndpoint`: Required, the endpoint for AUPs list page of the user
   - `apiUsername`: Required, the username of the API user
   - `apiPassword`: Required, the password of the API user
+  - `apiTimeout` : Optional, API timeout value in seconds (default: 15)
   - `userIdAttribute` : Optional, a string containing the name of the attribute whose value will be used to check if it is in userIdBlacklist.
   - `spBlacklist`: Optional, an array of strings that contains the SPs that the module will skip the process.
   - `userIdBlacklist`: Optional, an array of strings that contains the userIds for which the module will skip the AUP process. In order to be activated a value is required to userIdAttribute option.
@@ -23,6 +24,7 @@ The following configuration options are available for the UpdateAUP filter which
              'aupListEndpoint' => '',
              'apiUsername' => '',
              'apiPassword' => '',
+             'apiTimeout'  => 15,
              'userIdAttribute' => '',
              'spBlacklist' => array(),
              'userIdBlacklist' => array()
