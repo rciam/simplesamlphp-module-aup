@@ -31,6 +31,15 @@ The following configuration options are available for the UpdateAUP filter which
         ),
 ```
 
+###  View Loader
+
+The filter could exploit a pure css loader/spinner specified in the `loader` configuration option of the global theme used by the SimpleSAMLphp installation; if no `loader` configuration option is found (e.g. when using the default SimpleSAMLphp theme) then no loader will be shown.
+The loader element file must be included under `/includes` directory.
+e.g.
+```php
+$this->includeAtTemplateBase('includes/' . $loader . '.php');
+```
+
 ## Compatibility matrix
 
 This table matches the module version with the supported SimpleSAMLphp version.
