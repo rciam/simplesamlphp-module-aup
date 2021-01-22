@@ -40,7 +40,7 @@ if (array_key_exists('yes', $_REQUEST)) {
 
         if(!empty($_REQUEST['terms_and_conditions_'.$aup['id']])){
             // Make the post requests
-            addCoTAndCAgreement($state["rciamAttributes"]["registryUserId"], $aup['id'], $url, $state['aup:apiUsername'], $state['aup:apiPassword']);
+            addCoTAndCAgreement($state["rciamAttributes"]["registryUserId"], $aup['id'], $url, $state['aup:apiUsername'], $state['aup:apiPassword'], $state['aup:apiTimeout']);
         }
     }
     if (array_key_exists('aup:changedAups', $state)) {
@@ -59,6 +59,9 @@ if (array_key_exists('yes', $_REQUEST)) {
         unset($state['aup:aupPassword']);
     }
     SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+    if (array_key_exists('aup:apiTimeout', $state)) {
+            unset($state['aup:apiTimeout']);
+    }
 }
 
 // Make, populate and layout informed failure consent form
@@ -69,7 +72,7 @@ $t->data['changedAups'] = $state['aup:changedAups'];
 $t->data['aupListEndpoint'] = $state['aup:aupListEndpoint'];
 $t->show();
 
-function addCoTAndCAgreement($coPersonId, $coTAndCId, $url, $apiUser, $apiPass)
+function addCoTAndCAgreement($coPersonId, $coTAndCId, $url, $apiUser, $apiPass, $apiTimeout)
 {
     // Construct my data
     $reqDataArr = array();
@@ -80,11 +83,11 @@ function addCoTAndCAgreement($coPersonId, $coTAndCId, $url, $apiUser, $apiPass)
     $reqDataArr['CoTAndCAgreements'][0]['Person']['Type'] = 'CO';
     $reqDataArr['CoTAndCAgreements'][0]['Person']['Id'] = $coPersonId;
     $req = json_encode($reqDataArr);
-    $res = http('POST', $url, $req, $apiUser, $apiPass);
+    $res = http('POST', $url, $req, $apiUser, $apiPass, $apiTimeout);
     return $res;
 }
 
-function http($method, $url, $data = null, $apiUser, $apiPass)
+function http($method, $url, $data = null, $apiUser, $apiPass, $apiTimeout)
 {
 
     $ch = curl_init($url);
@@ -92,7 +95,7 @@ function http($method, $url, $data = null, $apiUser, $apiPass)
         $ch,
         array(
           CURLOPT_CUSTOMREQUEST => $method,
-          CURLOPT_CONNECTTIMEOUT => 5,
+          CURLOPT_CONNECTTIMEOUT => $apiTimeout,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_USERPWD => $apiUser . ":" . $apiPass,
         )
