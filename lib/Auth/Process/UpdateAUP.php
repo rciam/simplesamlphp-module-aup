@@ -24,7 +24,13 @@
  */
 namespace SimpleSAML\Module\aup\Auth\Process;
 
-class UpdateAUP extends SimpleSAML\Auth\ProcessingFilter
+use SimpleSAML\Auth\State;
+use SimpleSAML\Logger;
+use SimpleSAML\Module;
+use SimpleSAML\Utils\HTTP;
+use SimpleSAML\Error;
+
+class UpdateAUP extends \SimpleSAML\Auth\ProcessingFilter
 {
 
     public function __construct($config, $reserved)
@@ -41,7 +47,7 @@ class UpdateAUP extends SimpleSAML\Auth\ProcessingFilter
         );
         foreach ($params as $param) {
             if (!array_key_exists($param, $config)) {
-                throw new \SimpleSAML\Error\Exception(
+                throw new Error\Exception(
                     'Missing required configuration parameter: ' .$param);
             }
             $this->config[$param] = $config[$param];
@@ -66,19 +72,19 @@ class UpdateAUP extends SimpleSAML\Auth\ProcessingFilter
     public function process(&$state)
     {
         if (!empty($this->config['spBlacklist']) && isset($state['SPMetadata']['entityid']) && in_array($state['SPMetadata']['entityid'], $this->config['spBlacklist'], true)) {
-            SimpleSAML\Logger::debug("[aup:UpdateAUP] Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
+            Logger::debug("[aup:UpdateAUP] Skipping blacklisted SP ". var_export($state['SPMetadata']['entityid'], true));
             return;
         }
         // Check if user is in blacklist
         if ((!empty($this->config['userIdAttribute']) && !empty($state['Attributes'][$this->config['userIdAttribute']]) && !empty($this->config['userIdBlacklist']) && !empty(array_intersect(
             $state['Attributes'][$this->config['userIdAttribute']],
             $this->config['userIdBlacklist'])))) {
-            SimpleSAML\Logger::debug("[aup:UpdateAUP] Skipping blacklisted user with id " . var_export($state['Attributes'][$this->config['userIdAttribute']], true));
+            Logger::debug("[aup:UpdateAUP] Skipping blacklisted user with id " . var_export($state['Attributes'][$this->config['userIdAttribute']], true));
             return;
         }
         // Check if $state['rciamAttributes']['aup'] is empty
         if (empty($state['rciamAttributes']['aup'])) {
-            SimpleSAML\Logger::debug("[aup:UpdateAUP] No AUP information found in state - skipping");
+            Logger::debug("[aup:UpdateAUP] No AUP information found in state - skipping");
             return;
         }
         try {
@@ -98,9 +104,9 @@ class UpdateAUP extends SimpleSAML\Auth\ProcessingFilter
                     $state['aup:apiPassword'] = $this->config['apiPassword'];
                     $state['aup:apiTimeout'] = $this->config['apiTimeout'];
 
-                    $id = SimpleSAML\Auth\State::saveState($state, 'aup_state');
-                    $url = SimpleSAML\Module::getModuleURL('aup/aup_in_form.php');
-                    \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
+                    $id = State::saveState($state, 'aup_state');
+                    $url = Module::getModuleURL('aup/aup_in_form.php');
+                    HTTP::redirectTrustedURL($url, array('StateId' => $id));
           }
           return;
         } catch (\Exception $e) {
